@@ -7,7 +7,7 @@ import { ADMIN_USER, ADMIN_GROUP, TABLES } from '@shared/constants'
 import { randomUUID } from 'crypto'
 import { generate } from 'generate-password'
 import type { Flag } from '@shared/db/Flag'
-import appConfig from '../util/config'
+import appConfig, { basePath } from '../util/config'
 import type { OIDCPayload } from '@shared/db/OIDCPayload'
 import { hasTOTP } from './totp'
 import { getUserPasskeys } from './passkey'
@@ -99,6 +99,7 @@ export async function findAccount(_: KoaContextWithOIDC | null, id: string): Pro
         email_verified?: boolean
         preferred_username?: string
         name?: string | null
+        picture?: string | null
         groups?: string[]
       } = { sub: id }
 
@@ -110,6 +111,7 @@ export async function findAccount(_: KoaContextWithOIDC | null, id: string): Pro
       if (scope.includes('profile')) {
         accountClaims.preferred_username = user.username
         accountClaims.name = user.name
+        accountClaims.picture = basePath() + '/user/picture/' + user.username
       }
 
       if (scope.includes('groups')) {
